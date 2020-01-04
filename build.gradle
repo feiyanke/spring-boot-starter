@@ -36,7 +36,7 @@ generateGitProperties {
         def branch = project.ext.gitProps['git.branch']
         def tag = project.ext.gitProps['git.closest.tag.name']
         def count = project.ext.gitProps['git.closest.tag.commit.count']
-        if (branch == 'master' && count == 0) {
+        if (branch == 'master' && count == '0') {
             project.version = tag + '-RELEASE'
         } else if (branch == 'develop') {
             project.version = tag + '-SNAPSHOT'
