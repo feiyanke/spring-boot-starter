@@ -1,24 +1,93 @@
+buildscript {
+    repositories {
+        maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
+        maven { url 'http://maven.aliyun.com/nexus/content/repositories/jcenter'}
+    }
+}
+
 plugins {
-    id 'org.springframework.boot' version '2.2.2.RELEASE'
     id 'io.spring.dependency-management' version '1.0.8.RELEASE'
     id 'java'
+    id 'maven-publish'
+    id "com.gorylenko.gradle-git-properties" version "2.2.0"
 }
 
 group = 'io.my'
-version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '1.8'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
 
 repositories {
+    maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
+    maven { url 'http://maven.aliyun.com/nexus/content/repositories/jcenter'}
     mavenCentral()
+}
+
+gitProperties {
+    extProperty = 'gitProps'
+}
+
+generateGitProperties {
+    doLast {
+        def branch = project.ext.gitProps['git.branch']
+        def tag = project.ext.gitProps['git.closest.tag.name']
+        def count = project.ext.gitProps['git.closest.tag.commit.count']
+        if (branch == 'master' && count == 0) {
+            project.version = tag + '-RELEASE'
+        } else if (branch == 'develop') {
+            project.version = tag + '-SNAPSHOT'
+        } else {
+            project.version = tag + '-' + count
+        }
+
+        def releasesRepoUrl = "$buildDir/repos/releases"
+        def snapshotsRepoUrl = "$buildDir/repos/snapshots"
+        def url = project.version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+        publishing.repositories.maven.url = url
+    }
+}
+
+task sourceJar(type: Jar) {
+    from sourceSets.main.allJava
+    archiveClassifier = "sources"
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+            artifact sourceJar
+        }
+    }
+
+    repositories {
+        maven {}
+    }
+}
+
+generatePomFileForMavenPublication {
+    dependsOn(generateGitProperties)
+}
+
+jar {
+    dependsOn(generateGitProperties)
+    doFirst {
+        manifest {
+            attributes('Implementation-Title': project.name,
+                    'Implementation-Version': project.version)
+        }
+    }
+}
+
+dependencyManagement {
+    imports {
+        mavenBom("org.springframework.boot:spring-boot-dependencies:2.2.2.RELEASE")
+    }
 }
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter'
-    testImplementation('org.springframework.boot:spring-boot-starter-test') {
-        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
-    }
-}
-
-test {
-    useJUnitPlatform()
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
