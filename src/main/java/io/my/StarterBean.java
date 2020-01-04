@@ -11,7 +11,7 @@ public class StarterBean {
     private final StarterProperties properties;
 
     public void func1() {
-        System.out.println("111 StarterBean func1() called: " + properties);
+        System.out.println("666 StarterBean func1() called: " + properties);
     }
 
 
