@@ -12,3 +12,4 @@ public class StarterProperties {
     boolean property1 = true;
     String property2 = "2";
 }
+
