@@ -1,9 +1,7 @@
 package io.my;
 
-import lombok.Data;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -11,11 +9,6 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @EnableConfigurationProperties(StarterProperties.class)
-public class StarterAutoConfiguration {
-
-    @Bean
-    public StarterBean options(){
-        return new StarterBean();
-    }
-}
+@ComponentScan
+public class StarterAutoConfiguration { }
 
