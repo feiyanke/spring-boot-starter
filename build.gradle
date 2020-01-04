@@ -37,8 +37,8 @@ generateGitProperties {
         def tag = project.ext.gitProps['git.closest.tag.name']
         def count = project.ext.gitProps['git.closest.tag.commit.count']
         def dirty = project.ext.gitProps['git.dirty']
-
-        if (dirty) {
+        println dirty
+        if (dirty == 'true') {
             project.version = tag + "-dirty"
         }else if (branch == 'master' && count == '0') {
             project.version = tag + '-RELEASE'
